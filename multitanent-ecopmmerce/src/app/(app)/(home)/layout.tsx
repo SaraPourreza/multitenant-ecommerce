@@ -1,19 +1,62 @@
-import { Footer } from "./footer"
-import Navbar from "./navbar"
+import { Category } from "@/payload-types";
+import { Footer } from "./footer";
+import Navbar from "./navbar";
+import { SearchFilters } from "./search-filters";
+import configPromise from "@payload-config";
+import { getPayload } from "payload";
 
-interface Props{
-    children:React.ReactNode
+interface Props {
+  children: React.ReactNode;
 }
 
-const Layout = ({children}: Props) => {
+const Layout = async ({ children }: Props) => {
+  const payload = await getPayload({
+    config: configPromise,
+  });
+
+  const data = await payload.find({
+    collection: "categories",
+    depth: 1,//populate subcategories,subcategories.[0] will be a type of category
+    pagination: false,
+    where: {
+      parent: {
+        exists: false,
+      },
+    },
+  });
+  const formattedData = data.docs.map((doc) => ({
+    ...doc,
+    subcategories: (doc.subcategories?.docs ?? []).map((doc) => ({
+      //beacause of depth=1 we are confident doc will be a type of category
+      ...(doc as Category),
+      subcategories:undefined,
+    })),
+  }));
+ 
+//  const formattedData = data.docs.map((doc) => {
+//     const subcategories = Array.isArray(doc.subcategories) 
+//       ? doc.subcategories // Already an array
+//       : doc.subcategories?.docs || []; // Paginated response
+
+//     return {
+//       ...doc,
+//       subcategories: subcategories.map((subcat) => ({
+//         ...(subcat as Category),
+//         subcategories: undefined,
+//       })),
+//     };
+//   });
+  console.log({data,formattedData});
   return (
-    <div  className="flex flex-col min-h-screen">
-     <Navbar />
+    <div className="flex flex-col min-h-screen">
+      <Navbar />
 
-        <div className="flex-1 bg-[#f4f4f0]">{children}</div>
-        <Footer />
+      <SearchFilters data={formattedData} />
+      <div className="flex-1 bg-[#f4f4f0]">{children}</div>
+
+      <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;
