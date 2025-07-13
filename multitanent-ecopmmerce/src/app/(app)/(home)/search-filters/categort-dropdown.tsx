@@ -1,13 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Category } from "@/payload-types";
+
 import { useRef, useState } from "react";
 import { useDropDownPosition } from "./use-dropdown-position";
 import { SubCategoryMenu } from "./subcategory-menu";
+import { CustomCategory } from "../types";
+import Link from "next/link";
 
 interface Props {
-  category: Category;
+  category: CustomCategory;
   isActive: boolean;
   isNavigationHovered: boolean;
 }
@@ -20,7 +22,7 @@ export const CategoryDropdown = ({
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { getDropDownPosition } = useDropDownPosition(dropdownRef);
-  
+
   const onMouseEnter = () => {
     if (category.subcategories) {
       setIsOpen(true);
@@ -28,23 +30,36 @@ export const CategoryDropdown = ({
   };
   const onMouseLeave = () => setIsOpen(false);
 
-  const dropdownPosition = getDropDownPosition()
+  const dropdownPosition = getDropDownPosition();
+  // const toggleDropdown=()=>{
+  //   if (category.subcategories?.docs?.length){
+  //     setIsOpen(!isOpen)
+  //   }
+
+  // }
   return (
     <div
       ref={dropdownRef}
       className="relative"
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
+      // onClick={toggleDropdown}
     >
       <div className="relative">
         <Button
           variant="elevated"
           className={cn(
             "h-11 bg-transparent px-4 border-transparent rounded-full hover:bg-white hover:border-primary text-black",
-            isActive && !isNavigationHovered && "bg-white border-primary"
+            isActive && !isNavigationHovered && "bg-white border-primary",
+            isOpen && "bg-white border-primary shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] -translate-x-[4px] -translate-y-[4px]"
           )}
         >
-          {category.name}
+          <Link
+          href={`/${category.slug === "all" ? "" : category.slug}`}
+          >
+                {category.name}
+          </Link>
+    
         </Button>
         {category.subcategories && category.subcategories.length > 0 && (
           <div
