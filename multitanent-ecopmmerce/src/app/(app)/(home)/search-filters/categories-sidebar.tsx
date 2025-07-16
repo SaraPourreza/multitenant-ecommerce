@@ -2,43 +2,44 @@
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
-  SheetTrigger,
 } from "@/components/ui/sheet";
-import { CustomCategory } from "../types";
+
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { CategoryDropdown } from "./categort-dropdown";
+
 import { useRouter } from "next/navigation";
+import { useTRPC } from "@/trpc/client";
+import { useQuery } from "@tanstack/react-query";
+import { CategoriesGetManyOutput } from "@/modules/categories/types";
 
 interface Props {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  data: CustomCategory[];
+
 }
-export const CategoriesSidebar = ({ open, onOpenChange, data }: Props) => {
+export const CategoriesSidebar = ({ open, onOpenChange }: Props) => {
+    const trpc = useTRPC();
+    const { data }=useQuery(trpc.categories.getMany.queryOptions())
+
   const router = useRouter();
-  const [parentCategories, setParentCategories] = useState<
-    CustomCategory[] | null
+  const [parentCategories, setParentCategories] = useState<CategoriesGetManyOutput | null
   >(null);
-  const [selectedCategory, setSelectedCategory] =
-    useState<CustomCategory | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<CategoriesGetManyOutput[1] | null>(null);
 
   // if we have parent categories show those otherwise root category
   const currentCategories = parentCategories ?? data ?? [];
 
-  const handleOpenChange = (open : boolean) =>{
-    setSelectedCategory(null)
-    setParentCategories(null)
-    onOpenChange(open)
-
-  }
-  const handleCategoryClick = (category: CustomCategory) => {
+  const handleOpenChange = (open: boolean) => {
+    setSelectedCategory(null);
+    setParentCategories(null);
+    onOpenChange(open);
+  };
+  const handleCategoryClick = (category: CategoriesGetManyOutput[1]) => {
     if (category.subcategories && category.subcategories.length > 0) {
-      setParentCategories(category.subcategories as CustomCategory[]);
+      setParentCategories(category.subcategories as CategoriesGetManyOutput);
       setSelectedCategory(category);
     } else {
       // this is a leaf category(not subcategory)
@@ -53,17 +54,17 @@ export const CategoriesSidebar = ({ open, onOpenChange, data }: Props) => {
           router.push(`/${category.slug}`);
         }
       }
-      handleOpenChange(false)
+      handleOpenChange(false);
     }
   };
 
-  const handleBackClient=()=>{
-    if (parentCategories){
-        setParentCategories(null)
-        setSelectedCategory(null)
+  const handleBackClient = () => {
+    if (parentCategories) {
+      setParentCategories(null);
+      setSelectedCategory(null);
     }
-  }
-const backgroundColor=selectedCategory?.color || "white"
+  };
+  const backgroundColor = selectedCategory?.color || "white";
   return (
     <Sheet open={open} onOpenChange={handleOpenChange}>
       <SheetContent
