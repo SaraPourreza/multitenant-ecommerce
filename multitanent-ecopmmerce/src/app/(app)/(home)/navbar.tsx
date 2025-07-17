@@ -71,7 +71,7 @@ const Navbar = () => {
             variant="secondary"
             className="border-l border-t-0 border-b-0 border-r-0 px-12 rounded-none h-full bg-white hover:bg-pink-400 transition-colors text-lg"
           >
-            <Link href="/sign-in"> Log in</Link>
+            <Link prefetch href="/sign-in"> Log in</Link>
           </Button>
           <Button
             asChild
