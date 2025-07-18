@@ -6,6 +6,7 @@ import { TRPCError } from "@trpc/server";
 
 import { AUTH_COOKIE } from "../constant";
 import { loginSchema, registerSchema } from "../schemas";
+import { generateAuthCookies } from "../utils";
 
 export const authRouter = createTRPCRouter({
   session: baseProcedure.query(async ({ ctx }) => {
@@ -59,16 +60,23 @@ export const authRouter = createTRPCRouter({
           message: "failed to login",
         });
       }
-      const cookies= await getCookies()
-      cookies.set({
-        name:AUTH_COOKIE,
-        value:data.token,
-        httpOnly:true,
-        path:"/",
-        // sameSite:"",
-        // domain:"",
-      })
+
+           await generateAuthCookies({
+      prefix: ctx.db.config.cookiePrefix,
+      value:data.token
+    })
+      // const cookies= await getCookies()
+      // cookies.set({
+      //   name:AUTH_COOKIE,
+      //   value:data.token,
+      //   httpOnly:true,
+      //   path:"/",
+      //   // sameSite:"",
+      //   // domain:"",
+      // })
     }),
+
+
 
   login: baseProcedure
     .input(loginSchema)
@@ -86,15 +94,10 @@ export const authRouter = createTRPCRouter({
           message: "failed to login",
         });
       }
-      const cookies= await getCookies()
-      cookies.set({
-        name:AUTH_COOKIE,
-        value:data.token,
-        httpOnly:true,
-        path:"/",
-        // sameSite:"",
-        // domain:"",
-      })
+     await generateAuthCookies({
+      prefix: ctx.db.config.cookiePrefix,
+      value:data.token
+    })
       return data
     }),
 });
