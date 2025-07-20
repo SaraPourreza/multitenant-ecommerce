@@ -6,7 +6,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Link } from "lucide-react";
+
 
 interface Props {
   activeCategory?: string | null;
@@ -26,13 +26,15 @@ const BreadcrumbNavigation = ({
    {activeSubCategoryName ? (
     <>
      <BreadcrumbItem>
-      <BreadcrumbLink asChild className="text-xl font-medium underline text-primary">
+       <BreadcrumbLink href={`/${activeCategory}`} className="text-xl font-medium underline text-primary">{activeCategoryName}</BreadcrumbLink>
+      {/* <BreadcrumbLink asChild className="text-xl font-medium underline text-primary">
       <Link href={`/${activeCategory}`}>{activeCategoryName}</Link>
-      </BreadcrumbLink>
+      </BreadcrumbLink> */}
     </BreadcrumbItem>
        <BreadcrumbSeparator className="text-xl font-medium  text-primary">
   /
     </BreadcrumbSeparator>
+    
       <BreadcrumbItem>
       <BreadcrumbPage  className="text-xl font-medium ">
      {activeSubCategoryName}
