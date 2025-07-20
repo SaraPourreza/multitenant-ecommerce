@@ -11,6 +11,7 @@ import BreadcrumbNavigation from "./breadcrumbs-navigation";
 export const SearchFilters = () => {
   const trpc = useTRPC();
   const { data } = useSuspenseQuery(trpc.categories.getMany.queryOptions());
+  console.log(`dataindex:${data}`)
   const params = useParams();
   const categoryParam = params.category as string | undefined;
   const activeCategory = categoryParam || "all";
